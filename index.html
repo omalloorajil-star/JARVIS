@@ -1,0 +1,175 @@
+10.28 3:17 AM
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS AI</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: #07111f; color: #eaf6ff;
+    font-family: Arial, sans-serif;
+    display: grid; place-items: center;
+    padding: 20px;
+  }
+  main {
+    width: 100%; max-width: 540px;
+    border: 1px solid #24516b;
+    border-radius: 22px; padding: 24px;
+    background: #0b1a2a;
+    box-shadow: 0 0 35px #06344a55;
+  }
+  h1 { text-align: center; letter-spacing: 5px; }
+  .orb {
+    width: 105px; height: 105px; border-radius: 50%;
+    border: 3px solid #42d9ff;
+    box-shadow: 0 0 30px #00bfff66;
+    margin: 20px auto;
+    display: grid; place-items: center;
+    color: #42d9ff; font-size: 28px;
+  }
+  select, button, input {
+    width: 100%; padding: 13px; margin: 7px 0;
+    border-radius: 10px; font-size: 16px;
+  }
+  select, input {
+    background: #10283b; color: white;
+    border: 1px solid #31556b;
+  }
+  button {
+    background: #073c55; color: white;
+    border: 1px solid #42d9ff; cursor: pointer;
+  }
+  button:hover { background: #10516d; }
+  #log {
+    min-height: 125px; padding: 14px;
+    background: #06111d; border-radius: 10px;
+    white-space: pre-wrap; line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  .hint { color: #a8c6d8; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>J.A.R.V.I.S.</h1>
+  <div class="orb">AI</div>
+  <p style="text-align:center">Personal Assistant · Prototype 01</p>
+  <label for="lang">Language / ഭാഷ</label>
+  <select id="lang">
+    <option value="ml-IN">മലയാളം</option>
+    <option value="en-IN">English</option>
+  </select>
+  <div id="log" aria-live="polite">
+JARVIS online.
+നമസ്കാരം! എന്നോട് സംസാരിക്കൂ.
+  </div>
+  <button id="listen"> Speak / സംസാരിക്കുക</button>
+  <input id="message" placeholder="Type a message / ചോദ്യം എഴുതുക">
+  <button id="send">Send / അയയ്ക്കുക</button>
+  <button id="stop">Stop voice / ശബ്ദം നിർത്തുക</button>
+  <p class="hint">
+    Prototype: basic commands only. AI model connection
+    and computer control are not enabled yet.
+  </p>
+</main>
+<script>
+const log = document.getElementById("log");
+const lang = document.getElementById("lang");
+const input = document.getElementById("message");
+function say(text) {
+  log.textContent = "JARVIS: " + text;
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = lang.value;
+  speechSynthesis.speak(speech);
+}
+function reply(raw) {
+  const text = raw.toLowerCase().trim();
+  const isMalayalam = lang.value === "ml-IN";
+  let answer;
+  if (text.includes("time") || text.includes("സമയം")) {
+    answer = new Date().toLocaleTimeString(
+      isMalayalam ? "ml-IN" : "en-IN"
+    );
+  } else if (
+    text.includes("date") || text.includes("today") ||
+    text.includes("തീയതി")
+  ) {
+    answer = new Date().toLocaleDateString(
+      isMalayalam ? "ml-IN" : "en-IN",
+      { dateStyle: "full" }
+    );
+  } else if (
+    text.includes("hello") || text.includes("hi") ||
+    text.includes("ഹലോ") || text.includes("നമസ്കാരം")
+  ) {
+    answer = isMalayalam
+      ? "നമസ്കാരം! ഞാൻ നിന്റെ JARVIS prototype ആണ്."
+      : "Hello! I am your JARVIS prototype.";
+  } else if (
+    text.includes("your name") || text.includes("നിന്റെ പേര്")
+  ) {
+    answer = isMalayalam
+      ? "എന്റെ പേര് JARVIS."
+      : "My name is JARVIS.";
+  } else if (
+    text.includes("help") || text.includes("സഹായം")
+  ) {
+    answer = isMalayalam
+      ? "സമയം, തീയതി, നമസ്കാരം എന്നീ commands പരീക്ഷിക്കൂ."
+      : "Try asking the time, date, or say hello.";
+  } else {
+    answer = isMalayalam
+      ? "ഈ prototype-ൽ ആ command ചേർത്തിട്ടില്ല. പിന്നീട് AI brain ബന്ധിപ്പിക്കാം."
+      : "That command is not built into this prototype yet. An AI brain can be connected later.";
+  }
+  say(answer);
+}
+document.getElementById("send").onclick = () => {
+  if (!input.value.trim()) return;
+  const text = input.value;
+  log.textContent = "You: " + text;
+  input.value = "";
+  reply(text);
+};
+input.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    document.getElementById("send").click();
+  }
+});
+document.getElementById("listen").onclick = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    say(lang.value === "ml-IN"
+      ? "ഈ browser-ൽ speech recognition ലഭ്യമല്ല."
+      : "Speech recognition is not available in this browser.");
+    return;
+  }
+  const recognition = new SpeechRecognition();
+  recognition.lang = lang.value;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = event => {
+    const text = event.results[0][0].transcript;
+    log.textContent = "You: " + text;
+    reply(text);
+  };
+  recognition.onerror = event => {
+    log.textContent = "Voice error: " + event.error;
+  };
+  recognition.start();
+};
+document.getElementById("stop").onclick = () => {
+  speechSynthesis.cancel();
+  log.textContent = "Voice stopped.";
+};
+</script>
+</body>
+</html>
+
