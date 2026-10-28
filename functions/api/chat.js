@@ -61,11 +61,13 @@ export async function onRequestPost({ request, env }) {
       { headers }
     );
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: "AI request failed. Check the model and AI binding."
-      }),
-      { status: 500, headers }
-    );
+  console.error("JARVIS AI error:", error);
+
+  return new Response(
+    JSON.stringify({
+      error: "AI request failed.",
+      details: String(error?.message || error)
+    }),
+    { status: 500, headers }
+  );
   }
-}
