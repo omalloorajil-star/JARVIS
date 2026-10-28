@@ -1,175 +1,520 @@
-10.28 3:17 AM
-index.html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JARVIS AI</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh;
-    background: #07111f; color: #eaf6ff;
-    font-family: Arial, sans-serif;
-    display: grid; place-items: center;
-    padding: 20px;
-  }
-  main {
-    width: 100%; max-width: 540px;
-    border: 1px solid #24516b;
-    border-radius: 22px; padding: 24px;
-    background: #0b1a2a;
-    box-shadow: 0 0 35px #06344a55;
-  }
-  h1 { text-align: center; letter-spacing: 5px; }
-  .orb {
-    width: 105px; height: 105px; border-radius: 50%;
-    border: 3px solid #42d9ff;
-    box-shadow: 0 0 30px #00bfff66;
-    margin: 20px auto;
-    display: grid; place-items: center;
-    color: #42d9ff; font-size: 28px;
-  }
-  select, button, input {
-    width: 100%; padding: 13px; margin: 7px 0;
-    border-radius: 10px; font-size: 16px;
-  }
-  select, input {
-    background: #10283b; color: white;
-    border: 1px solid #31556b;
-  }
-  button {
-    background: #073c55; color: white;
-    border: 1px solid #42d9ff; cursor: pointer;
-  }
-  button:hover { background: #10516d; }
-  #log {
-    min-height: 125px; padding: 14px;
-    background: #06111d; border-radius: 10px;
-    white-space: pre-wrap; line-height: 1.6;
-    overflow-wrap: anywhere;
-  }
-  .hint { color: #a8c6d8; font-size: 13px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050b16">
+  <title>JARVIS AI</title>
+
+  <style>
+    :root {
+      --cyan: #45e5ff;
+      --blue: #1598d4;
+      --bg: #050b16;
+      --panel: #0a1627;
+      --text: #e8f8ff;
+      --muted: #8eafc4;
+      --border: #173d56;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 16px;
+      background:
+        radial-gradient(ellipse at top, #102c45 0%, transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 12px 0 18px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--cyan);
+      font-size: clamp(27px, 7vw, 42px);
+      letter-spacing: 8px;
+      text-shadow: 0 0 22px #45e5ff55;
+    }
+
+    .subtitle {
+      margin-top: 9px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--muted);
+    }
+
+    .core {
+      width: 115px;
+      height: 115px;
+      margin: 10px auto 18px;
+      border: 2px solid var(--cyan);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      position: relative;
+      box-shadow:
+        0 0 20px #45e5ff35,
+        inset 0 0 22px #45e5ff20;
+    }
+
+    .core::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 1px dashed #45e5ff88;
+      border-radius: 50%;
+      animation: rotate 14s linear infinite;
+    }
+
+    .core span {
+      font-size: 24px;
+      color: var(--cyan);
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .status {
+      text-align: center;
+      color: #70edba;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .panel {
+      background: #091626ee;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 40px #0004;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    select, input, button {
+      font: inherit;
+    }
+
+    select {
+      flex: 1;
+      min-width: 0;
+      padding: 11px;
+      color: var(--text);
+      background: #07111f;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    #chat {
+      height: min(43vh, 390px);
+      min-height: 240px;
+      overflow-y: auto;
+      padding: 8px;
+      background: #050d18;
+      border: 1px solid #102b40;
+      border-radius: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      padding: 12px 14px;
+      margin: 10px 0;
+      border-radius: 13px;
+      line-height: 1.65;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      margin-left: 18px;
+      background: #10344b;
+      border: 1px solid #1a4c68;
+    }
+
+    .assistant {
+      margin-right: 18px;
+      background: #0d2132;
+      border: 1px solid #17374c;
+    }
+
+    .who {
+      display: block;
+      color: var(--cyan);
+      font-size: 11px;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    #message {
+      flex: 1;
+      width: 0;
+      min-width: 0;
+      padding: 14px;
+      color: white;
+      background: #07111f;
+      border: 1px solid #24516b;
+      border-radius: 12px;
+      outline: none;
+    }
+
+    #message:focus {
+      border-color: var(--cyan);
+    }
+
+    button {
+      padding: 12px;
+      color: var(--text);
+      background: #0b3046;
+      border: 1px solid #2588ad;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    button:hover {
+      background: #12516e;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    #send {
+      min-width: 76px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .actions button {
+      font-size: 13px;
+    }
+
+    .note {
+      margin: 14px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      body { padding: 9px; }
+      .panel { padding: 10px; }
+      .toolbar { gap: 6px; }
+      .actions { grid-template-columns: 1fr 1fr; }
+      .message { font-size: 14px; }
+      #send { min-width: 62px; }
+    }
+  </style>
 </head>
+
 <body>
-<main>
-  <h1>J.A.R.V.I.S.</h1>
-  <div class="orb">AI</div>
-  <p style="text-align:center">Personal Assistant · Prototype 01</p>
-  <label for="lang">Language / ഭാഷ</label>
-  <select id="lang">
-    <option value="ml-IN">മലയാളം</option>
-    <option value="en-IN">English</option>
-  </select>
-  <div id="log" aria-live="polite">
-JARVIS online.
-നമസ്കാരം! എന്നോട് സംസാരിക്കൂ.
-  </div>
-  <button id="listen"> Speak / സംസാരിക്കുക</button>
-  <input id="message" placeholder="Type a message / ചോദ്യം എഴുതുക">
-  <button id="send">Send / അയയ്ക്കുക</button>
-  <button id="stop">Stop voice / ശബ്ദം നിർത്തുക</button>
-  <p class="hint">
-    Prototype: basic commands only. AI model connection
-    and computer control are not enabled yet.
-  </p>
-</main>
-<script>
-const log = document.getElementById("log");
-const lang = document.getElementById("lang");
-const input = document.getElementById("message");
-function say(text) {
-  log.textContent = "JARVIS: " + text;
-  if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = lang.value;
-  speechSynthesis.speak(speech);
-}
-function reply(raw) {
-  const text = raw.toLowerCase().trim();
-  const isMalayalam = lang.value === "ml-IN";
-  let answer;
-  if (text.includes("time") || text.includes("സമയം")) {
-    answer = new Date().toLocaleTimeString(
-      isMalayalam ? "ml-IN" : "en-IN"
-    );
-  } else if (
-    text.includes("date") || text.includes("today") ||
-    text.includes("തീയതി")
-  ) {
-    answer = new Date().toLocaleDateString(
-      isMalayalam ? "ml-IN" : "en-IN",
-      { dateStyle: "full" }
-    );
-  } else if (
-    text.includes("hello") || text.includes("hi") ||
-    text.includes("ഹലോ") || text.includes("നമസ്കാരം")
-  ) {
-    answer = isMalayalam
-      ? "നമസ്കാരം! ഞാൻ നിന്റെ JARVIS prototype ആണ്."
-      : "Hello! I am your JARVIS prototype.";
-  } else if (
-    text.includes("your name") || text.includes("നിന്റെ പേര്")
-  ) {
-    answer = isMalayalam
-      ? "എന്റെ പേര് JARVIS."
-      : "My name is JARVIS.";
-  } else if (
-    text.includes("help") || text.includes("സഹായം")
-  ) {
-    answer = isMalayalam
-      ? "സമയം, തീയതി, നമസ്കാരം എന്നീ commands പരീക്ഷിക്കൂ."
-      : "Try asking the time, date, or say hello.";
-  } else {
-    answer = isMalayalam
-      ? "ഈ prototype-ൽ ആ command ചേർത്തിട്ടില്ല. പിന്നീട് AI brain ബന്ധിപ്പിക്കാം."
-      : "That command is not built into this prototype yet. An AI brain can be connected later.";
-  }
-  say(answer);
-}
-document.getElementById("send").onclick = () => {
-  if (!input.value.trim()) return;
-  const text = input.value;
-  log.textContent = "You: " + text;
-  input.value = "";
-  reply(text);
-};
-input.addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    document.getElementById("send").click();
-  }
-});
-document.getElementById("listen").onclick = () => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    say(lang.value === "ml-IN"
-      ? "ഈ browser-ൽ speech recognition ലഭ്യമല്ല."
-      : "Speech recognition is not available in this browser.");
-    return;
-  }
-  const recognition = new SpeechRecognition();
-  recognition.lang = lang.value;
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.onresult = event => {
-    const text = event.results[0][0].transcript;
-    log.textContent = "You: " + text;
-    reply(text);
-  };
-  recognition.onerror = event => {
-    log.textContent = "Voice error: " + event.error;
-  };
-  recognition.start();
-};
-document.getElementById("stop").onclick = () => {
-  speechSynthesis.cancel();
-  log.textContent = "Voice stopped.";
-};
-</script>
+  <main class="app">
+    <header>
+      <h1>J.A.R.V.I.S.</h1>
+      <div class="subtitle">PERSONAL AI ASSISTANT</div>
+    </header>
+
+    <div class="core" aria-hidden="true">
+      <span>AI</span>
+    </div>
+
+    <div class="status" id="status" role="status">
+      ● JARVIS interface ready
+    </div>
+
+    <section class="panel">
+      <div class="toolbar">
+        <label for="language">Language</label>
+        <select id="language">
+          <option value="ml-IN">മലയാളം</option>
+          <option value="en-IN">English</option>
+        </select>
+      </div>
+
+      <div id="chat" aria-live="polite">
+        <div class="message assistant">
+          <span class="who">JARVIS</span>
+          നമസ്കാരം! ഞാൻ JARVIS ആണ്. എന്താണ് സഹായം വേണ്ടത്?
+        </div>
+      </div>
+
+      <form id="form">
+        <input
+          id="message"
+          type="text"
+          placeholder="Ask JARVIS anything..."
+          autocomplete="off"
+          maxlength="2000"
+          required
+        >
+        <button id="send" type="submit">Send</button>
+      </form>
+
+      <div class="actions">
+        <button id="mic" type="button">🎙️ Speak</button>
+        <button id="read" type="button">🔊 Read reply</button>
+        <button id="stop" type="button">⏹ Stop voice</button>
+      </div>
+    </section>
+
+    <p class="note">
+      Cloud AI connection · Malayalam + English · Mobile + Desktop
+      <br>
+      Voice recognition availability depends on your browser.
+    </p>
+  </main>
+
+  <script>
+    // Cloudflare Pages Function:
+    // functions/api/chat.js -> /api/chat
+    const CHAT_ENDPOINT = "/api/chat";
+
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("message");
+    const sendButton = document.getElementById("send");
+    const micButton = document.getElementById("mic");
+    const language = document.getElementById("language");
+    const status = document.getElementById("status");
+
+    let lastReply = "";
+    let recognition = null;
+
+    function setStatus(text) {
+      status.textContent = "● " + text;
+    }
+
+    function addMessage(text, role) {
+      const bubble = document.createElement("div");
+      bubble.className = "message " + role;
+
+      const who = document.createElement("span");
+      who.className = "who";
+      who.textContent = role === "user" ? "YOU" : "JARVIS";
+
+      const content = document.createElement("span");
+      content.textContent = text;
+
+      bubble.appendChild(who);
+      bubble.appendChild(content);
+      chat.appendChild(bubble);
+
+      chat.scrollTop = chat.scrollHeight;
+      return content;
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) {
+        setStatus("Speech output is not supported");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language.value;
+      utterance.rate = 1;
+      utterance.pitch = 1;
+
+      utterance.onstart = () => setStatus("Speaking");
+      utterance.onend = () => setStatus("Online");
+      utterance.onerror = () => setStatus("Online");
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    async function sendMessage(message) {
+      if (!message || sendButton.disabled) return;
+
+      addMessage(message, "user");
+      sendButton.disabled = true;
+      micButton.disabled = true;
+      input.disabled = true;
+
+      setStatus("Thinking...");
+      const answerElement = addMessage("Thinking...", "assistant");
+
+      try {
+        const response = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: message,
+            language: language.value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Server error: " + response.status
+          );
+        }
+
+        const reply =
+          data.reply ||
+          data.response ||
+          data.text;
+
+        if (typeof reply !== "string" || !reply.trim()) {
+          throw new Error("The AI returned an empty response.");
+        }
+
+        lastReply = reply;
+        answerElement.textContent = reply;
+        setStatus("Online");
+
+      } catch (error) {
+        answerElement.textContent =
+          "ക്ഷമിക്കണം! AI-യുമായി ബന്ധപ്പെടാൻ കഴിഞ്ഞില്ല.\n\n" +
+          "Check that /api/chat is deployed and the Cloudflare AI binding is configured.\n" +
+          "Details: " + error.message;
+
+        setStatus("Connection error");
+        console.error("JARVIS error:", error);
+
+      } finally {
+        sendButton.disabled = false;
+        micButton.disabled = false;
+        input.disabled = false;
+        input.focus();
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const message = input.value.trim();
+      if (!message) return;
+
+      input.value = "";
+      await sendMessage(message);
+    });
+
+    micButton.addEventListener("click", function() {
+      const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        setStatus("Voice input is not supported in this browser");
+        return;
+      }
+
+      if (recognition) {
+        try {
+          recognition.abort();
+        } catch (_) {}
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = language.value;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = function() {
+        setStatus("Listening...");
+        micButton.disabled = true;
+      };
+
+      recognition.onresult = async function(event) {
+        const transcript = event.results[0][0].transcript.trim();
+
+        if (transcript) {
+          input.value = transcript;
+          await sendMessage(transcript);
+        }
+      };
+
+      recognition.onerror = function(event) {
+        setStatus("Voice error: " + event.error);
+      };
+
+      recognition.onend = function() {
+        micButton.disabled = false;
+        recognition = null;
+      };
+
+      try {
+        recognition.start();
+      } catch (error) {
+        setStatus("Could not start microphone");
+        micButton.disabled = false;
+      }
+    });
+
+    document.getElementById("read").addEventListener("click", function() {
+      if (lastReply) {
+        speak(lastReply);
+      } else {
+        setStatus("No reply to read yet");
+      }
+    });
+
+    document.getElementById("stop").addEventListener("click", function() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      if (recognition) {
+        try {
+          recognition.abort();
+        } catch (_) {}
+      }
+
+      setStatus("Voice stopped");
+    });
+
+    language.addEventListener("change", function() {
+      setStatus("Language changed");
+    });
+  </script>
 </body>
 </html>
-
